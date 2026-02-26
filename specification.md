@@ -107,7 +107,6 @@ Example:
 }
 
 Fields:
-```json
 text : string
 font : string (optional)
 size : number (optional)
@@ -128,7 +127,6 @@ Example:
 }
 
 Fields:
-```json
 x1 : number (dot)
 y1 : number (dot)
 x2 : number (dot)
