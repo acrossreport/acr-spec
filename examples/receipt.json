@@ -1,0 +1,61 @@
+{
+  "version": "1.0",
+  "page": {
+    "width": 576,
+    "height": 800,
+    "unit": "dot"
+  },
+  "controls": [
+    {
+      "type": "text",
+      "x": 0,
+      "y": 0,
+      "text": "ACR DEMO STORE",
+      "size": 32
+    },
+    {
+      "type": "line",
+      "x1": 0,
+      "y1": 50,
+      "x2": 576,
+      "y2": 50,
+      "width": 2
+    },
+    {
+      "type": "text",
+      "x": 0,
+      "y": 80,
+      "text": "Item A        500",
+      "size": 24
+    },
+    {
+      "type": "text",
+      "x": 0,
+      "y": 120,
+      "text": "Item B        300",
+      "size": 24
+    },
+    {
+      "type": "line",
+      "x1": 0,
+      "y1": 160,
+      "x2": 576,
+      "y2": 160,
+      "width": 2
+    },
+    {
+      "type": "text",
+      "x": 0,
+      "y": 190,
+      "text": "TOTAL         800",
+      "size": 28
+    },
+    {
+      "type": "barcode",
+      "x": 0,
+      "y": 240,
+      "data": "123456789012",
+      "symbology": "CODE128"
+    }
+  ]
+}
