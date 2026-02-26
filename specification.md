@@ -189,6 +189,7 @@ CODE39
 EAN13
 EAN8
 
+---
 ## 10. ZIP Container Format
 
 ACR templates may be packaged as ZIP files.
@@ -211,8 +212,9 @@ Origin is top-left corner.
 X increases to the right.
 Y increases downward.
 ```
-
 Unit is dot.
+
+---
 
 ## 12. Rendering Model
 
