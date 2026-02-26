@@ -193,6 +193,7 @@ EAN8
 
 ACR templates may be packaged as ZIP files.
 
+```Folders
 Structure:
 ```json
 template.json
@@ -200,7 +201,6 @@ fonts/
 images/
 meta.json
 ```
-
 template.json is required.
 
 ## 11. Coordinate Rules
