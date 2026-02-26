@@ -1,3 +1,4 @@
+
 # ACR Template Specification v1.0
 
 ## 1. Overview
@@ -15,6 +16,8 @@ Supported output targets include:
 - PDF
 - PNG
 
+ACR enables high-speed and cross-platform printing.
+
 ---
 
 ## 2. Coordinate System
@@ -31,8 +34,10 @@ Example:
 
 Origin is top-left corner.
 
-X increases to the right.
+X increases to the right.  
 Y increases downward.
+
+All coordinates use absolute positioning.
 
 ---
 
@@ -46,56 +51,52 @@ Example:
   "page": {},
   "controls": []
 }
+```
 
----
+Fields:
 
-## 4. Page Object
+version : string  
+page : Page object  
+controls : array of Control objects  
+
+##4. Page Object
+
+Defines the logical page size.
 
 Example:
 
-```json
 {
   "width": 576,
   "height": 800,
   "unit": "dot"
 }
 
----
-
-```markdown
 Fields:
 
-width : number (dot)  
-height : number (dot)  
-unit : "dot"  
-
-Notes:
-
-width and height define logical page size.
+width : number (dot)
+height : number (dot)
+unit : string ("dot")
 
 Receipt printers may extend height dynamically.
 
----
+##5. Control Object
 
-## 5. Control Object
-
-Control defines a drawable element.
+Defines a drawable element.
 
 Common fields:
 
-type : string  
-x : number (dot)  
-y : number (dot)  
+type : string
+x : number (dot)
+y : number (dot)
 
----
+Each control represents a renderable object.
 
-## 6. Text Control
+##6. Text Control
 
 Draws text.
 
 Example:
 
-```json
 {
   "type": "text",
   "x": 0,
@@ -105,15 +106,18 @@ Example:
   "size": 24
 }
 
----
+Fields:
 
-## 7. Line Control
+text : string
+font : string (optional)
+size : number (optional)
+
+##7. Line Control
 
 Draws a line between two points.
 
 Example:
 
-```json
 {
   "type": "line",
   "x1": 0,
@@ -123,30 +127,20 @@ Example:
   "width": 2
 }
 
-<img width="504" height="422" alt="image" src="https://github.com/user-attachments/assets/7029f5d0-6b46-45b1-ba08-7f8db86a6105" />
-
-```markdown
 Fields:
 
-x1 : number (dot) — start position X  
-y1 : number (dot) — start position Y  
-x2 : number (dot) — end position X  
-y2 : number (dot) — end position Y  
-width : number (dot) — line thickness  
+x1 : number (dot)
+y1 : number (dot)
+x2 : number (dot)
+y2 : number (dot)
+width : number (dot)
 
-Notes:
-
-Coordinates are absolute positions in the page coordinate system.
-
----
-
-## 8. Image Control
+##8. Image Control
 
 Draws an image.
 
 Example:
 
-```json
 {
   "type": "image",
   "x": 0,
@@ -156,114 +150,97 @@ Example:
   "src": "logo.png"
 }
 
-9. Barcode Control
+Fields:
+
+src : string
+width : number (dot)
+height : number (dot)
+
+##9. Barcode Control
+
 Draws a barcode.
 
 Example:
+
 {
   "type": "barcode",
-  ...
+  "x": 100,
+  "y": 300,
+  "data": "123456789012",
+  "symbology": "CODE128"
 }
 
 Fields:
 
-data : string — barcode content  
-symbology : string — barcode type  
+data : string
+symbology : string
 
-Notes:
+Supported types may include:
 
-Common symbologies include:
+CODE128
+CODE39
+EAN13
+EAN8
 
-CODE128  
-CODE39  
-EAN13  
-EAN8  
-
----
-
-## 10. ZIP Container Format
+1##0. ZIP Container Format
 
 ACR templates may be packaged as ZIP files.
 
 Structure:
 
-template.json  
-fonts/  
-images/  
-meta.json  
+template.json
+fonts/
+images/
+meta.json
 
-Description:
+template.json is required.
 
-template.json — main template definition  
-fonts/ — optional font files  
-images/ — optional image resources  
-meta.json — optional metadata  
-
----
-
-## 11. Coordinate Rules
+##11. Coordinate Rules
 
 Origin is top-left corner.
 
-Coordinate directions:
-
-X increases to the right  
-Y increases downward  
+X increases to the right.
+Y increases downward.
 
 Unit is dot.
 
----
-
-## 12. Rendering Model
+##12. Rendering Model
 
 Rendering process:
 
-1. Load template.json  
-2. Parse controls  
-3. Convert controls to native printer commands  
-4. Send commands to printer  
+Load template.json
+
+Parse controls
+
+Convert controls to native printer commands
+
+Send commands to printer
 
 No printer driver is required.
 
----
-
-## 13. Design Goals
-
-Printer independent  
-High performance  
-Simple JSON structure  
-Cross-platform compatibility  
-
----
-
-## 14. Compatibility
+##13. Compatibility
 
 ACR can be implemented in:
 
-Rust  
-C#  
-C++  
-Java  
-Swift  
-JavaScript  
-WebAssembly  
+Rust
+C#
+C++
+Java
+Swift
+JavaScript
+WebAssembly
 
-Target outputs include:
+ACR can generate output for:
 
-ESC/POS  
-StarPRNT  
-SATO  
-TEC  
-PDF  
-PNG  
+ESC/POS
+StarPRNT
+SATO
+TEC
+PDF
+PNG
 
----
-
-## 15. Version
+##14. Version
 
 Specification version:
 
 1.0
-
-
-
