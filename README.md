@@ -35,3 +35,16 @@ See specification.md for full details.
     }
   ]
 }
+
+
+## Files
+
+- Specification: [specification.md](./specification.md)
+- JSON Schema: [template.schema.json](./template.schema.json)
+- Example Template: [examples/receipt.json](./examples/receipt.json)
+
+## Version
+
+ACR Template Specification v1.0
+
+
