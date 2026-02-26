@@ -73,7 +73,7 @@ Example:
   "height": 800,
   "unit": "dot"
 }
-
+```
 Fields:
 
 width : number (dot)
