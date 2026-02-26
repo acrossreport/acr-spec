@@ -4,6 +4,27 @@ ACR is a printer-independent template format for high-speed and direct printing.
 
 ACR separates layout rendering from printer control.
 
+## Why ACR?
+
+Traditional printing relies on vendor-specific command sets such as ESC/POS.
+
+ACR introduces a rendering-first architecture.
+
+Instead of generating printer commands directly,
+ACR defines layout in a device-independent coordinate system
+and renders through a unified drawing engine.
+
+This ensures:
+
+- Consistent output across PDF, Image, and Printer
+- No vendor lock-in
+- WebAssembly compatibility
+- Serverless direct printing capability
+
+ACR is not just a template format.
+It is a rendering architecture.
+
+
 ## Features
 
 - Printer independent
