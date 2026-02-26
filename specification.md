@@ -204,10 +204,9 @@ fonts/
 images/
 meta.json
 ```
-template.json is required.
 
 ---
-```markdown
+
 ## 11. Coordinate Rules
 
 Origin is top-left corner.
