@@ -110,6 +110,7 @@ Example:
   "font": "default",
   "size": 24
 }
+```
 
 Fields:
 text : string
@@ -130,6 +131,7 @@ Example:
   "y2": 100,
   "width": 2
 }
+```
 
 Fields:
 x1 : number (dot)
@@ -152,6 +154,7 @@ Example:
   "height": 100,
   "src": "logo.png"
 }
+```
 
 Fields:
 
@@ -172,6 +175,7 @@ Example:
   "data": "123456789012",
   "symbology": "CODE128"
 }
+```
 
 Fields:
 
@@ -195,6 +199,7 @@ template.json
 fonts/
 images/
 meta.json
+```
 
 template.json is required.
 
