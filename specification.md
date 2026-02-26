@@ -59,10 +59,13 @@ version : string
 page : Page object  
 controls : array of Control objects  
 
+---
+
 ## 4. Page Object
 
 Defines the logical page size.
 
+```markdown id="a6pq1h"
 Example:
 ```json
 {
@@ -78,6 +81,8 @@ height : number (dot)
 unit : string ("dot")
 
 Receipt printers may extend height dynamically.
+
+---
 
 ## 5. Control Object
 
