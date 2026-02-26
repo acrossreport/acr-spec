@@ -211,7 +211,7 @@ meta.json
 
 Origin is top-left corner.
 
-```json
+```
 X increases to the right.
 Y increases downward.
 ```
