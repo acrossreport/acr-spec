@@ -96,7 +96,7 @@ Each control represents a renderable object.
 Draws text.
 
 Example:
-
+```json
 {
   "type": "text",
   "x": 0,
@@ -107,7 +107,7 @@ Example:
 }
 
 Fields:
-
+```json
 text : string
 font : string (optional)
 size : number (optional)
@@ -117,7 +117,7 @@ size : number (optional)
 Draws a line between two points.
 
 Example:
-
+```json
 {
   "type": "line",
   "x1": 0,
@@ -128,7 +128,7 @@ Example:
 }
 
 Fields:
-
+```json
 x1 : number (dot)
 y1 : number (dot)
 x2 : number (dot)
@@ -140,7 +140,7 @@ width : number (dot)
 Draws an image.
 
 Example:
-
+```json
 {
   "type": "image",
   "x": 0,
@@ -161,7 +161,7 @@ height : number (dot)
 Draws a barcode.
 
 Example:
-
+```json
 {
   "type": "barcode",
   "x": 100,
@@ -176,18 +176,18 @@ data : string
 symbology : string
 
 Supported types may include:
-
+```json
 CODE128
 CODE39
 EAN13
 EAN8
 
-1# #0. ZIP Container Format
+## 10. ZIP Container Format
 
 ACR templates may be packaged as ZIP files.
 
 Structure:
-
+```json
 template.json
 fonts/
 images/
@@ -199,6 +199,7 @@ template.json is required.
 
 Origin is top-left corner.
 
+```json
 X increases to the right.
 Y increases downward.
 
