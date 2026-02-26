@@ -162,6 +162,8 @@ src : string
 width : number (dot)
 height : number (dot)
 
+---
+
 ## 9. Barcode Control
 
 Draws a barcode.
@@ -183,7 +185,6 @@ data : string
 symbology : string
 
 Supported types may include:
-```json
 CODE128
 CODE39
 EAN13
