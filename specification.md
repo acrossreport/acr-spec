@@ -190,13 +190,14 @@ EAN13
 EAN8
 
 ---
+
 ## 10. ZIP Container Format
 
 ACR templates may be packaged as ZIP files.
 
-```Folders
 Structure:
-```json
+
+```text
 template.json
 fonts/
 images/
@@ -204,6 +205,8 @@ meta.json
 ```
 template.json is required.
 
+---
+```markdown
 ## 11. Coordinate Rules
 
 Origin is top-left corner.
