@@ -210,6 +210,7 @@ Origin is top-left corner.
 ```json
 X increases to the right.
 Y increases downward.
+```
 
 Unit is dot.
 
@@ -231,6 +232,7 @@ No printer driver is required.
 
 ACR can be implemented in:
 
+```Code
 Rust
 C#
 C++
@@ -238,15 +240,18 @@ Java
 Swift
 JavaScript
 WebAssembly
+```
 
 ACR can generate output for:
 
+```Command
 ESC/POS
 StarPRNT
 SATO
 TEC
 PDF
 PNG
+```
 
 ## 14. Version
 
