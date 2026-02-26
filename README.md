@@ -35,6 +35,7 @@ See specification.md for full details.
     }
   ]
 }
+```
 
 ---
 
