@@ -2,7 +2,7 @@
 
 ACR is a printer-independent template format for high-speed and direct printing.
 
-ACR allows applications to generate printer-native commands from a unified JSON template without relying on printer drivers.
+ACR separates layout rendering from printer control.
 
 ## Features
 
