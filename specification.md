@@ -64,7 +64,7 @@ controls : array of Control objects
 Defines the logical page size.
 
 Example:
-
+```json
 {
   "width": 576,
   "height": 800,
