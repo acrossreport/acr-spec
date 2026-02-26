@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ACR Template Schema",
+  "type": "object",
+  "required": ["version", "page", "controls"],
+  "properties": {
+    "version": {
+      "type": "string"
+    },
+    "page": {
+      "type": "object",
+      "required": ["width", "height", "unit"],
+      "properties": {
+        "width": {
+          "type": "number"
+        },
+        "height": {
+          "type": "number"
+        },
+        "unit": {
+          "type": "string",
+          "enum": ["dot"]
+        }
+      }
+    },
+    "controls": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["text", "line", "image", "barcode"]
+          },
+          "x": { "type": "number" },
+          "y": { "type": "number" },
+          "x1": { "type": "number" },
+          "y1": { "type": "number" },
+          "x2": { "type": "number" },
+          "y2": { "type": "number" },
+          "width": { "type": "number" },
+          "height": { "type": "number" },
+          "text": { "type": "string" },
+          "font": { "type": "string" },
+          "size": { "type": "number" },
+          "src": { "type": "string" },
+          "data": { "type": "string" },
+          "symbology": { "type": "string" }
+        }
+      }
+    }
+  }
+}
