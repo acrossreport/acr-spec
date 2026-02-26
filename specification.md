@@ -59,7 +59,7 @@ version : string
 page : Page object  
 controls : array of Control objects  
 
-##4. Page Object
+## 4. Page Object
 
 Defines the logical page size.
 
@@ -79,7 +79,7 @@ unit : string ("dot")
 
 Receipt printers may extend height dynamically.
 
-##5. Control Object
+## 5. Control Object
 
 Defines a drawable element.
 
@@ -91,7 +91,7 @@ y : number (dot)
 
 Each control represents a renderable object.
 
-##6. Text Control
+## 6. Text Control
 
 Draws text.
 
@@ -112,7 +112,7 @@ text : string
 font : string (optional)
 size : number (optional)
 
-##7. Line Control
+## 7. Line Control
 
 Draws a line between two points.
 
@@ -135,7 +135,7 @@ x2 : number (dot)
 y2 : number (dot)
 width : number (dot)
 
-##8. Image Control
+## 8. Image Control
 
 Draws an image.
 
@@ -156,7 +156,7 @@ src : string
 width : number (dot)
 height : number (dot)
 
-##9. Barcode Control
+## 9. Barcode Control
 
 Draws a barcode.
 
@@ -182,7 +182,7 @@ CODE39
 EAN13
 EAN8
 
-1##0. ZIP Container Format
+1# #0. ZIP Container Format
 
 ACR templates may be packaged as ZIP files.
 
@@ -195,7 +195,7 @@ meta.json
 
 template.json is required.
 
-##11. Coordinate Rules
+## 11. Coordinate Rules
 
 Origin is top-left corner.
 
@@ -204,7 +204,7 @@ Y increases downward.
 
 Unit is dot.
 
-##12. Rendering Model
+## 12. Rendering Model
 
 Rendering process:
 
@@ -218,7 +218,7 @@ Send commands to printer
 
 No printer driver is required.
 
-##13. Compatibility
+## 13. Compatibility
 
 ACR can be implemented in:
 
@@ -239,7 +239,7 @@ TEC
 PDF
 PNG
 
-##14. Version
+## 14. Version
 
 Specification version:
 
