@@ -72,11 +72,11 @@ See `specification.md` for full details.
   ]
 }
 
----
-
-## Version
-
-ACR Template Specification v1.0
-
 ACR aims to redefine how reporting and printing are built in modern software systems.
 
+---
+
+## Intellectual Property
+
+Certain aspects of the ACR architecture are subject to patent protection.
+Patent pending in Japan.
