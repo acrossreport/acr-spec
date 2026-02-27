@@ -80,3 +80,4 @@ ACR aims to redefine how reporting and printing are built in modern software sys
 
 Certain aspects of the ACR architecture are subject to patent protection.
 Patent pending in Japan.
+
