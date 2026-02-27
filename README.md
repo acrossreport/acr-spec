@@ -72,6 +72,8 @@ See `specification.md` for full details.
   ]
 }
 
+---
+
 ## Version
 
 ACR Template Specification v1.0
