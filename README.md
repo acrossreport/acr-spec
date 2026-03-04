@@ -71,6 +71,7 @@ See `specification.md` for full details.
     }
   ]
 }
+```
 
 ACR aims to redefine how reporting and printing are built in modern software systems.
 
