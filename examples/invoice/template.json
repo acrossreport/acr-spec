@@ -1,0 +1,29 @@
+{
+  "page": {
+    "width": 595,
+    "height": 842
+  },
+  "header": [
+    {
+      "type": "text",
+      "text": "INVOICE",
+      "x": 200,
+      "y": 40,
+      "font_size": 24
+    }
+  ],
+  "detail": [
+    {
+      "type": "text",
+      "text": "{{item.name}}",
+      "x": 40,
+      "y": 200
+    },
+    {
+      "type": "text",
+      "text": "{{item.price}}",
+      "x": 400,
+      "y": 200
+    }
+  ]
+}
