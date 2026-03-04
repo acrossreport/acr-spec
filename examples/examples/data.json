@@ -1,0 +1,27 @@
+{
+  "invoice": {
+    "number": "INV-001",
+    "date": "2026-03-05",
+    "customer": "Sample Customer"
+  },
+
+  "items": [
+    {
+      "name": "Product A",
+      "qty": 2,
+      "price": 1200
+    },
+    {
+      "name": "Product B",
+      "qty": 1,
+      "price": 800
+    },
+    {
+      "name": "Product C",
+      "qty": 5,
+      "price": 300
+    }
+  ],
+
+  "total": 3500
+}
