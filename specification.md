@@ -31,9 +31,9 @@
 
 ## 1. Overview
 
-ACR defines a **printer-independent report template format** using JSON.
+ACR (Across Report) is a printer-independent reporting specification designed for modern software systems.
 
-The rendering pipeline is:
+ACR defines a structured layout model and rendering rules for generating reports using JSON-based templates and datasets.
 
 ```
 template.json + data.json
@@ -122,9 +122,32 @@ ACR uses **twips** as its coordinate unit throughout.
 - Y increases downward
 - All coordinates are **absolute** within the section
 
+### Available Sections
+
+- PageHeader
+- GroupHeader
+- Detail
+- GroupFooter
+- PageFooter
+
+### Rules
+
+- Sections are rendered in vertical order
+- Each section has a fixed height
+- Sections cannot overlap
+- Sections are processed sequentially
+
+
 ---
 
 ## 4. Template Root Structure
+
+Data is provided as a dataset consisting of rows.
+
+- Detail section is repeated for each row
+- GroupHeader and GroupFooter are triggered by group value changes
+
+### Group Definition
 
 ```json
 {
