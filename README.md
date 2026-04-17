@@ -1,18 +1,30 @@
-ACR Specification
+Each layer has a single responsibility:
 
-ACR (Across Report) is a printer-independent reporting specification designed for modern software systems.
+| Layer | Role |
+|---|---|
+| **Template** | JSON-based report definition. Platform-neutral. |
+| **Layout Engine** | Resolves sections, binds data, calculates positions. |
+| **Drawing Engine** | Renders to pixels using Google Skia. 1-dot precision. |
+| **Output** | PDF, PNG, SVG, or any target format. |
 
-Render once. Output everywhere.
+This separation means:
+- The same template runs on Windows, macOS, and Linux without modification.
+- Preview in the designer is **pixel-identical** to the final printed output (WYSIWYG).
+- Output format is a detail — not a constraint.
 
-ACR separates layout description, rendering, and output generation, allowing the same template to be rendered across multiple platforms and output formats.
+---
 
-------------------------------------------------
+### Key Design Principles
 
-Why ACR
+**Printer independence**
+ACR does not rely on printer drivers or OS print subsystems. Layout is calculated in device-independent units and rendered at the target resolution.
 
-Traditional reporting systems are tightly coupled to specific printers, rendering engines, or frameworks.
+**JSON as the intermediate model**
+Templates are defined in human-readable JSON. The layout engine produces a drawing model — also JSON — that can be inspected, cached, or transmitted independently of rendering.
 
-ACR introduces a clean architecture:
+**Skia-based rendering**
+The drawing engine uses Google Skia, the same graphics library behind Chrome and Android. This guarantees consistent, high-fidelity output across all platforms.
 
-Template → Layout → Drawing Engine → Output
+**ActiveReports-compatible section model**
+ACR adopts a familiar section-based structure (Report Header, Page Header, Detail, Group, Page Footer, Report Footer) compatible with ActiveReports conventions, minimizing migration effort for existing report definitions.
 
