@@ -1,871 +1,420 @@
-# ACR Template Specification v2.0
+# ACR Template Specification v1.0
 
-**ACR (Across Report)** — Printer-Independent Section-Based Report Template Specification
+## Overview
 
-> **Status:** Beta
-> This specification may change until the first stable release.
+ACR (Across Report) defines a printer-independent report template format based on JSON.
 
----
+ACR separates layout definition, rendering, and output generation into distinct layers.  
+The same template produces identical output on any platform and any output target.
 
-## Table of Contents
+> *Render once. Output everywhere.*
 
-1. [Purpose](#1-purpose)
-2. [Scope](#2-scope)
-3. [Core Design Principles](#3-core-design-principles)
-4. [Terminology](#4-terminology)
-5. [Coordinate System and Units](#5-coordinate-system-and-units)
-6. [Page Model](#6-page-model)
-7. [Section Model](#7-section-model)
-8. [Section Rendering Order](#8-section-rendering-order)
-9. [Pagination Rules](#9-pagination-rules)
-10. [Group Processing Rules](#10-group-processing-rules)
-11. [Detail Processing Rules](#11-detail-processing-rules)
-12. [Controls](#12-controls)
-13. [Control Common Properties](#13-control-common-properties)
-14. [Label Control](#14-label-control)
-15. [Field Control](#15-field-control)
-16. [Line Control](#16-line-control)
-17. [Rectangle Control](#17-rectangle-control)
-18. [Planned Controls](#18-planned-controls)
-19. [Data Model](#19-data-model)
-20. [Field Resolution Rules](#20-field-resolution-rules)
-21. [Formatting Rules](#21-formatting-rules)
-22. [Template Root Structure](#22-template-root-structure)
-23. [Normative Rendering Constraints](#23-normative-rendering-constraints)
-24. [Output Model](#24-output-model)
-25. [Minimal Example](#25-minimal-example)
-26. [Extended Example](#26-extended-example)
-27. [Compatibility Policy](#27-compatibility-policy)
-28. [Non-Goals](#28-non-goals)
-29. [Versioning Policy](#29-versioning-policy)
-30. [Changelog](#30-changelog)
+### Supported Output Targets
+
+| Target | Description |
+|--------|-------------|
+| PDF | High-fidelity document output |
+| PNG | Pixel-accurate raster image |
+| SVG | Scalable vector output |
+| ESC/POS | Thermal receipt printers |
+| StarPRNT | Star Micronics printers |
+| SATO | SATO label printers |
+| TEC | Toshiba TEC printers |
 
 ---
 
-## 1. Purpose
+## Architecture
 
-ACR is a printer-independent report template specification for defining fixed-layout reports in JSON.
+```
+Template (JSON)
+    ↓
+Layout Engine        — resolves sections, binds data, calculates positions
+    ↓
+Drawing Model (JSON) — intermediate representation, inspectable and cacheable
+    ↓
+Drawing Engine       — renders via Google Skia (1-dot precision)
+    ↓
+Output               — PDF / PNG / ESC/POS / StarPRNT / SATO / TEC
+```
 
-Its purpose is to separate:
+### Design Principles
 
-* template structure,
-* data binding,
-* layout processing, and
-* output rendering.
+**Printer independence**  
+ACR does not rely on printer drivers or OS print subsystems.  
+Layout is calculated in device-independent units and rendered at the target resolution.
 
-The same template and dataset should be renderable to multiple output formats without changing the report definition itself.
+**WYSIWYG guarantee**  
+The on-screen preview is pixel-identical to the final printed output.  
+Not a single dot of deviation is permitted.
 
----
+**Hardware-free preview**  
+A complete, pixel-accurate preview is available without physical printers or drivers.
 
-## 2. Scope
+**JSON as the intermediate model**  
+Both the template and the drawing model are JSON.  
+They can be inspected, cached, versioned, and transmitted independently of rendering.
 
-This specification defines:
+**Skia-based rendering**  
+The drawing engine uses Google Skia — the same graphics library behind Chrome and Android.  
+This guarantees consistent, high-fidelity output across all platforms.
 
-* the page model,
-* the section model,
-* the control model,
-* data binding behavior,
-* pagination behavior,
-* group break behavior,
-* rendering order, and
-* output expectations.
-
-This specification does **not** define:
-
-* visual designer implementation,
-* editor UI behavior,
-* printer driver behavior,
-* operating system specific font substitution rules,
-* sub-report execution.
-
----
-
-## 3. Core Design Principles
-
-### 3.1 Printer Independence
-
-ACR templates must not depend on any specific printer driver.
-
-### 3.2 Fixed Layout
-
-ACR is a fixed-layout model.
-All controls use absolute coordinates.
-There is no HTML-like flow layout and no automatic reflow.
-
-### 3.3 Section-Based Processing
-
-ACR uses a banded section structure compatible with traditional report engines.
-The report is built by processing sections in a deterministic vertical sequence.
-
-### 3.4 Data and Layout Separation
-
-Template JSON defines layout.
-Data JSON defines row values.
-The renderer combines both at runtime.
-
-### 3.5 Deterministic Rendering
-
-Given the same template, data, and rendering environment, the engine should produce the same layout result.
+**ActiveReports-compatible section model**  
+ACR adopts a section-based layout structure compatible with ActiveReports conventions.
 
 ---
 
-## 4. Terminology
+## Coordinate System
 
-| Term           | Meaning                                               |
-| -------------- | ----------------------------------------------------- |
-| Template       | JSON document describing page, sections, and controls |
-| Data           | JSON document providing row data                      |
-| Page           | One logical output page                               |
-| Section        | One band in the report layout                         |
-| Control        | One drawable item inside a section                    |
-| Detail         | Repeating section rendered for each data row          |
-| Group          | Logical row grouping based on a field value           |
-| Printable Area | Page area remaining after margins are applied         |
-| Current Row    | Data row currently being rendered                     |
-| Next Row       | Next data row used for break detection                |
+- **Unit:** dot
+- **Definition:** 1 dot = 1/DPI inch  
+  Example: at 203 DPI, 1 inch = 203 dots
+- **Origin:** top-left corner of the page
+- **X-axis:** increases to the right
+- **Y-axis:** increases downward
+- **Positioning:** all coordinates use absolute positioning
 
 ---
 
-## 5. Coordinate System and Units
+## Template Structure
 
-### 5.1 Unit
-
-ACR uses **twips** as the canonical coordinate unit.
-
-* 1 inch = 1440 twips
-* 1 point = 20 twips
-* 1 mm ≈ 56.69 twips
-
-All page sizes, margins, section heights, and control bounds are expressed in twips.
-
-### 5.2 Origin
-
-The coordinate origin is the top-left corner of the containing area.
-
-* X increases left to right
-* Y increases top to bottom
-
-### 5.3 Coordinate Space
-
-* Page-level values are relative to the logical page
-* Section control coordinates are relative to the top-left of the section
-
-### 5.4 Numeric Values
-
-Implementations may accept integer or floating-point numeric values.
-Internally, engines may round as needed for rendering, but layout interpretation must remain logically stable.
-
----
-
-## 6. Page Model
-
-The page object defines logical page size and margins.
+A template is a single JSON file with the following root structure.
 
 ```json
 {
-  "page": {
-    "width": 11906,
-    "height": 16838,
-    "margin_top": 1440,
-    "margin_bottom": 1440,
-    "margin_left": 1440,
-    "margin_right": 1440
+  "version": "1.0",
+  "page": { ... },
+  "datasource": { ... },
+  "sections": [ ... ]
+}
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `version` | string | ✓ | Specification version. Currently `"1.0"` |
+| `page` | object | ✓ | Page size and margin definitions |
+| `datasource` | object | | Data binding configuration |
+| `sections` | array | ✓ | Ordered list of report sections |
+
+---
+
+## Page Object
+
+Defines the logical page size and margins.
+
+```json
+{
+  "width": 2480,
+  "height": 3508,
+  "unit": "dot",
+  "dpi": 300,
+  "margin": {
+    "top": 118,
+    "bottom": 118,
+    "left": 118,
+    "right": 118
   }
 }
 ```
 
-### 6.1 Page Fields
+| Field | Type | Description |
+|-------|------|-------------|
+| `width` | number | Page width in dots |
+| `height` | number | Page height in dots |
+| `unit` | string | Always `"dot"` |
+| `dpi` | number | Target resolution (e.g. 300, 203, 96) |
+| `margin` | object | Page margins in dots (top / bottom / left / right) |
 
-| Field           | Type   | Required | Description            |
-| --------------- | ------ | -------- | ---------------------- |
-| `width`         | number | Yes      | Page width in twips    |
-| `height`        | number | Yes      | Page height in twips   |
-| `margin_top`    | number | No       | Top margin in twips    |
-| `margin_bottom` | number | No       | Bottom margin in twips |
-| `margin_left`   | number | No       | Left margin in twips   |
-| `margin_right`  | number | No       | Right margin in twips  |
+**Common page sizes at 300 DPI:**
 
-### 6.2 Printable Area
-
-Printable area is calculated as:
-
-* printable width = page width - left margin - right margin
-* printable height = page height - top margin - bottom margin
-
-All section placement must occur within the printable area.
+| Paper | Width (dot) | Height (dot) |
+|-------|-------------|--------------|
+| A4 | 2480 | 3508 |
+| Letter | 2550 | 3300 |
+| Receipt 80mm | 945 | dynamic |
 
 ---
 
-## 7. Section Model
+## Section Model
 
-ACR uses a section-based structure.
-A section is a vertical band with a fixed height and a list of controls.
+ACR uses a section-based layout model compatible with ActiveReports.  
+Sections are processed in order and rendered to the page sequentially.
 
-### 7.1 Supported Section Types
+### Section Types
 
-* `report_header`
-* `page_header`
-* `group_header`
-* `detail`
-* `group_footer`
-* `page_footer`
-* `report_footer`
+| Section | Rendered | Description |
+|---------|----------|-------------|
+| `ReportHeader` | Once at the start of the report | Title, logo, report metadata |
+| `PageHeader` | Top of every page | Column headings, page title |
+| `GroupHeader` | Start of each data group (nestable) | Group label, subtotal header |
+| `Detail` | Once per data record | Main content rows |
+| `GroupFooter` | End of each data group (nestable) | Group subtotals |
+| `PageFooter` | Bottom of every page | Page numbers, date |
+| `ReportFooter` | Once at the end of the report | Grand totals, signatures |
 
-### 7.2 Section Basics
-
-Each section has:
-
-* a type,
-* a fixed height,
-* zero or more controls.
-
-Example:
+### Section Definition
 
 ```json
 {
-  "height": 600,
-  "controls": []
+  "type": "PageHeader",
+  "height": 120,
+  "canGrow": false,
+  "elements": [ ... ]
 }
 ```
 
-### 7.3 Section Constraints
+| Field | Type | Description |
+|-------|------|-------------|
+| `type` | string | Section type (see table above) |
+| `height` | number | Section height in dots |
+| `canGrow` | boolean | Whether the section expands to fit content |
+| `groupKey` | string | Data field used for grouping (GroupHeader / GroupFooter only) |
+| `elements` | array | List of controls within the section |
 
-* Sections are processed vertically, not layered as free-floating bands
-* Section height is fixed during layout
-* Controls belong to exactly one section
-* Section structure must not be rewritten during rendering
+### Group Nesting
 
----
-
-## 8. Section Rendering Order
-
-The logical rendering order of a report is:
-
-1. `report_header` once at report start
-2. `page_header` at the top of each page
-3. zero or more `group_header` sections when a group opens
-4. `detail` for each data row
-5. zero or more `group_footer` sections when a group closes
-6. `page_footer` at the bottom of each page
-7. `report_footer` once at report end
-
-### 8.1 First Page
-
-If defined, `report_header` is processed before the first detail row.
-`page_header` is still processed for the first page.
-
-### 8.2 Last Page
-
-If defined, `report_footer` is processed after the last data-dependent section.
-
----
-
-## 9. Pagination Rules
-
-Pagination is section-based.
-A section is placed only if enough remaining vertical space exists in the current page.
-
-### 9.1 Remaining Height
-
-Remaining height is calculated inside the printable area after accounting for already placed sections and reserved footer space if applicable.
-
-### 9.2 Page Break Condition
-
-A new page must be started when the next required section cannot fit in the available remaining height.
-
-### 9.3 Page Header and Footer Behavior
-
-* `page_header` is rendered on every page if defined
-* `page_footer` is rendered on every page if defined
-
-### 9.4 Explicit New Page
-
-If a section has a `new_page` behavior flag in an implementation, the engine must start a new page before rendering that section.
-
-### 9.5 No Section Splitting
-
-A section is treated as a single layout unit.
-It must not be split across multiple pages unless the implementation explicitly defines a special future behavior.
-
----
-
-## 10. Group Processing Rules
-
-Groups are based on field value transitions.
-
-### 10.1 Group Definition
-
-A group is defined by a field name.
-
-Example:
+GroupHeader and GroupFooter sections can be nested to represent multi-level grouping.
 
 ```json
-{
-  "group_data_field": "customer_code"
-}
+[
+  { "type": "GroupHeader", "groupKey": "department", "elements": [...] },
+  { "type": "GroupHeader", "groupKey": "category",   "elements": [...] },
+  { "type": "Detail",                                 "elements": [...] },
+  { "type": "GroupFooter", "groupKey": "category",   "elements": [...] },
+  { "type": "GroupFooter", "groupKey": "department",  "elements": [...] }
+]
 ```
 
-### 10.2 Group Open
+---
 
-A group opens when:
+## Controls
 
-* processing begins for the first row, or
-* the current row group value differs from the previous row group value.
+Controls are the drawable elements within a section.
 
-### 10.3 Group Break
+### Common Fields
 
-A group break occurs when:
-
-* the current row value differs from the next row value, or
-* there is no next row.
-
-### 10.4 Group Header
-
-When a group opens, the corresponding `group_header` must be rendered before the row detail associated with that group.
-
-### 10.5 Group Footer
-
-When a group closes, the corresponding `group_footer` must be rendered after the final detail row belonging to that group.
-
-### 10.6 Nested Groups
-
-If multiple groups are supported, they must be processed from outermost to innermost on open, and from innermost to outermost on close.
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `type` | string | ✓ | Control type |
+| `x` | number | ✓ | X position in dots (from section left edge) |
+| `y` | number | ✓ | Y position in dots (from section top edge) |
+| `width` | number | ✓ | Width in dots |
+| `height` | number | ✓ | Height in dots |
+| `visible` | boolean | | Default: `true` |
 
 ---
 
-## 11. Detail Processing Rules
+### TextBox
 
-### 11.1 Detail Iteration
-
-The `detail` section is rendered once for each row in `rows`.
-
-### 11.2 Row Order
-
-Rows are processed in source order.
-ACR does not define sorting behavior in the specification itself.
-If sorting is needed, it must be applied before rendering or by an engine-specific extension.
-
-### 11.3 Empty Dataset
-
-If `rows` is empty:
-
-* `detail` is not rendered,
-* group sections are not rendered,
-* report-level and page-level sections may still render depending on engine policy.
-
-For stable behavior, implementations should document how empty reports are handled.
-
----
-
-## 12. Controls
-
-A control is a drawable object placed inside a section.
-
-Supported current controls:
-
-* `label`
-* `field`
-* `line`
-* `rectangle`
-
-Planned controls:
-
-* `image`
-* `barcode`
-
----
-
-## 13. Control Common Properties
-
-All controls share the following base properties.
-
-| Field    | Type   | Required | Description                  |
-| -------- | ------ | -------- | ---------------------------- |
-| `type`   | string | Yes      | Control type                 |
-| `x`      | number | Yes      | Left position within section |
-| `y`      | number | Yes      | Top position within section  |
-| `width`  | number | Yes      | Control width                |
-| `height` | number | Yes      | Control height               |
-
-### 13.1 Bounds
-
-Control coordinates are relative to the containing section.
-
-### 13.2 Overflow
-
-This specification does not define auto-growth or auto-shrink behavior.
-If text exceeds available bounds, behavior is implementation-defined unless extended later.
-
----
-
-## 14. Label Control
-
-A label renders static text defined directly in the template.
+Renders text with font and alignment control.
 
 ```json
 {
-  "type": "label",
+  "type": "TextBox",
   "x": 0,
   "y": 0,
-  "width": 3000,
-  "height": 400,
-  "text": "Invoice",
-  "font_name": "Noto Sans JP",
-  "font_size": 24,
-  "bold": true,
-  "italic": false,
+  "width": 1200,
+  "height": 80,
+  "text": "{{ invoiceTitle }}",
+  "font": {
+    "family": "IPAexMincho",
+    "size": 24,
+    "bold": true,
+    "italic": false
+  },
+  "alignment": "center",
+  "verticalAlignment": "middle",
   "color": "#000000",
-  "align": "left",
-  "valign": "top"
+  "canGrow": true
 }
 ```
 
-| Field       | Type    | Required | Description               |
-| ----------- | ------- | -------- | ------------------------- |
-| `text`      | string  | Yes      | Static text               |
-| `font_name` | string  | No       | Font family               |
-| `font_size` | number  | No       | Font size in points       |
-| `bold`      | boolean | No       | Bold style                |
-| `italic`    | boolean | No       | Italic style              |
-| `color`     | string  | No       | Text color in `#RRGGBB`   |
-| `align`     | string  | No       | `left`, `center`, `right` |
-| `valign`    | string  | No       | `top`, `middle`, `bottom` |
+| Field | Type | Description |
+|-------|------|-------------|
+| `text` | string | Text content. Supports `{{ field }}` data binding |
+| `font.family` | string | Font family name |
+| `font.size` | number | Font size in points |
+| `font.bold` | boolean | Bold |
+| `font.italic` | boolean | Italic |
+| `alignment` | string | `left` / `center` / `right` |
+| `verticalAlignment` | string | `top` / `middle` / `bottom` |
+| `color` | string | Text color in hex |
+| `canGrow` | boolean | Expand height to fit content |
 
 ---
 
-## 15. Field Control
+### Line
 
-A field renders data-bound text resolved from the current row.
+Draws a straight line.
 
 ```json
 {
-  "type": "field",
+  "type": "Line",
+  "x": 0,
+  "y": 118,
+  "x2": 2244,
+  "y2": 118,
+  "lineWidth": 2,
+  "color": "#000000"
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `x2` | number | End X position in dots |
+| `y2` | number | End Y position in dots |
+| `lineWidth` | number | Line thickness in dots |
+| `color` | string | Line color in hex |
+
+---
+
+### Rectangle
+
+Draws a filled or outlined rectangle.
+
+```json
+{
+  "type": "Rectangle",
   "x": 0,
   "y": 0,
-  "width": 3000,
-  "height": 400,
-  "field": "customer_name",
-  "font_size": 12,
-  "align": "left",
-  "format": ""
+  "width": 2244,
+  "height": 120,
+  "lineWidth": 1,
+  "borderColor": "#000000",
+  "fillColor": "#F0F0F0"
 }
 ```
 
-| Field       | Type    | Required | Description               |
-| ----------- | ------- | -------- | ------------------------- |
-| `field`     | string  | Yes      | Data key name             |
-| `font_name` | string  | No       | Font family               |
-| `font_size` | number  | No       | Font size in points       |
-| `bold`      | boolean | No       | Bold style                |
-| `italic`    | boolean | No       | Italic style              |
-| `color`     | string  | No       | Text color                |
-| `align`     | string  | No       | `left`, `center`, `right` |
-| `valign`    | string  | No       | `top`, `middle`, `bottom` |
-| `format`    | string  | No       | Formatting instruction    |
-
 ---
 
-## 16. Line Control
+### Image
 
-A line renders a straight line using the control bounds.
+Renders an image asset.
 
 ```json
 {
-  "type": "line",
+  "type": "Image",
   "x": 0,
   "y": 0,
-  "width": 5000,
-  "height": 0,
-  "color": "#000000",
-  "thickness": 20
+  "width": 300,
+  "height": 300,
+  "src": "images/logo.png",
+  "sizing": "fit"
 }
 ```
 
-| Field       | Type   | Required | Description    |
-| ----------- | ------ | -------- | -------------- |
-| `color`     | string | No       | Line color     |
-| `thickness` | number | No       | Line thickness |
-
-Horizontal line: use `height = 0`
-Vertical line: use `width = 0`
+| Field | Type | Description |
+|-------|------|-------------|
+| `src` | string | Path within the ZIP container |
+| `sizing` | string | `fit` / `fill` / `clip` |
 
 ---
 
-## 17. Rectangle Control
+### Barcode
 
-A rectangle renders a bordered and/or filled rectangle.
+Renders a barcode or QR code.
 
 ```json
 {
-  "type": "rectangle",
-  "x": 0,
-  "y": 0,
-  "width": 5000,
-  "height": 800,
-  "fill_color": "#F5F5F5",
-  "border_color": "#CCCCCC",
-  "border_thickness": 15,
-  "radius": 0
+  "type": "Barcode",
+  "x": 100,
+  "y": 300,
+  "width": 600,
+  "height": 120,
+  "data": "{{ orderCode }}",
+  "symbology": "CODE128",
+  "showText": true
 }
 ```
 
-| Field              | Type   | Required | Description            |
-| ------------------ | ------ | -------- | ---------------------- |
-| `fill_color`       | string | No       | Fill color or `none`   |
-| `border_color`     | string | No       | Border color or `none` |
-| `border_thickness` | number | No       | Border thickness       |
-| `radius`           | number | No       | Corner radius          |
+| Field | Type | Description |
+|-------|------|-------------|
+| `data` | string | Barcode data. Supports data binding |
+| `symbology` | string | `CODE128` / `CODE39` / `EAN13` / `EAN8` / `QR` |
+| `showText` | boolean | Display human-readable text below barcode |
 
 ---
 
-## 18. Planned Controls
+## Data Binding
 
-### 18.1 Image
-
-Image is planned but not normative in the current stable control set.
-
-### 18.2 Barcode
-
-Barcode is planned but not normative in the current stable control set.
-
-Planned controls must not be treated as required behavior by current engines unless explicitly implemented.
-
----
-
-## 19. Data Model
-
-The data document is row-based.
+Field values are bound using `{{ fieldName }}` syntax inside `text` and `data` properties.
 
 ```json
-{
-  "rows": [
-    {
-      "customer_name": "Acme Corp",
-      "invoice_no": "INV-001",
-      "amount": 150000
-    }
-  ]
-}
+{ "text": "Invoice No: {{ invoiceNumber }}" }
+{ "text": "Total: {{ formatCurrency(totalAmount) }}" }
+{ "text": "Page {{ pageNumber }} of {{ pageCount }}" }
 ```
 
-| Field  | Type  | Required | Description          |
-| ------ | ----- | -------- | -------------------- |
-| `rows` | array | Yes      | Array of row objects |
+### Built-in Variables
 
-Each row is a key-value map.
-
----
-
-## 20. Field Resolution Rules
-
-### 20.1 Detail Section Resolution
-
-In `detail`, a `field` control resolves against the current row.
-
-### 20.2 Non-Detail Resolution
-
-In report-level and page-level sections, if field-based controls are allowed by an implementation, they resolve using the engine's current row context.
-A common policy is to use the first row when available.
-That policy must be documented by the engine.
-
-### 20.3 Missing Field
-
-If the specified field key does not exist, the rendered value must be treated as an empty string.
-
-### 20.4 Null Value
-
-If a field value is null, the engine should render it as an empty string unless engine-specific formatting rules specify otherwise.
+| Variable | Description |
+|----------|-------------|
+| `pageNumber` | Current page number |
+| `pageCount` | Total page count |
+| `reportDate` | Report generation date |
 
 ---
 
-## 21. Formatting Rules
+## ZIP Container Format
 
-Field controls may support formatting.
+ACR templates may be packaged as a ZIP archive for distribution.
 
-Examples:
-
-* `#,##0`
-* `#,##0.00`
-* `YYYY-MM-DD`
-
-This specification defines the existence of a `format` property, but exact format token behavior may remain engine-specific until the formatting grammar is fully standardized.
-
----
-
-## 22. Template Root Structure
-
-A template root contains page definition and section definitions.
-
-```json
-{
-  "version": "2.0",
-  "page": {
-    "width": 11906,
-    "height": 16838,
-    "margin_top": 1440,
-    "margin_bottom": 1440,
-    "margin_left": 1440,
-    "margin_right": 1440
-  },
-  "report_header": { ... },
-  "page_header": { ... },
-  "detail": { ... },
-  "page_footer": { ... },
-  "report_footer": { ... }
-}
 ```
-
-### 22.1 Root Fields
-
-| Field           | Type            | Required | Description             |
-| --------------- | --------------- | -------- | ----------------------- |
-| `version`       | string          | Yes      | Specification version   |
-| `page`          | object          | Yes      | Page definition         |
-| `report_header` | object          | No       | Report start section    |
-| `page_header`   | object          | No       | Per-page header         |
-| `group_header`  | object or array | No       | Group header definition |
-| `detail`        | object          | Yes      | Detail section          |
-| `group_footer`  | object or array | No       | Group footer definition |
-| `page_footer`   | object          | No       | Per-page footer         |
-| `report_footer` | object          | No       | Report end section      |
-
-Implementations may support either a single group band or multiple grouped bands.
-The actual accepted structure must be reflected in the schema used by that engine version.
-
----
-
-## 23. Normative Rendering Constraints
-
-The following constraints are normative:
-
-1. Section order must remain stable.
-2. Existing layout logic must not be silently changed by the template processor.
-3. The section hierarchy is part of report integrity and must be preserved.
-4. Pagination must be based on available remaining height.
-5. Detail rows must be processed sequentially.
-6. Group break judgment must be based on value transition logic.
-7. A control must not render outside its section coordinate system conceptually, even if a renderer clips or rounds visually.
-
----
-
-## 24. Output Model
-
-ACR is intended to support multiple output targets.
-Current and planned examples include:
-
-| Format      | Description                          |
-| ----------- | ------------------------------------ |
-| PDF         | Multi-page document output           |
-| PNG package | Per-page image output                |
-| ZIP package | Bundle output such as PDF and images |
-| ESC/POS     | Planned thermal printer output       |
-| ZPL         | Planned label printer output         |
-
-The specification defines layout behavior independently of output format.
-
----
-
-## 25. Minimal Example
-
-```json
-{
-  "version": "2.0",
-  "page": {
-    "width": 11906,
-    "height": 16838,
-    "margin_top": 1440,
-    "margin_bottom": 1440,
-    "margin_left": 1440,
-    "margin_right": 1440
-  },
-  "detail": {
-    "height": 600,
-    "controls": [
-      {
-        "type": "field",
-        "x": 0,
-        "y": 100,
-        "width": 9000,
-        "height": 400,
-        "field": "name",
-        "font_size": 12
-      }
-    ]
-  }
-}
-```
-
-**data.json**
-
-```json
-{
-  "rows": [
-    { "name": "Alice" },
-    { "name": "Bob" },
-    { "name": "Charlie" }
-  ]
-}
+template.acr  (ZIP)
+├── template.json   ← Main template definition
+├── meta.json       ← Template metadata
+├── fonts/          ← Embedded font files
+└── images/         ← Embedded image assets
 ```
 
 ---
 
-## 26. Extended Example
+## Rendering Model
 
-```json
-{
-  "version": "2.0",
-  "page": {
-    "width": 11906,
-    "height": 16838,
-    "margin_top": 1440,
-    "margin_bottom": 1440,
-    "margin_left": 1440,
-    "margin_right": 1440
-  },
-  "report_header": {
-    "height": 1200,
-    "controls": [
-      {
-        "type": "label",
-        "x": 0,
-        "y": 200,
-        "width": 9000,
-        "height": 600,
-        "text": "INVOICE",
-        "font_size": 28,
-        "bold": true,
-        "align": "center"
-      }
-    ]
-  },
-  "page_header": {
-    "height": 700,
-    "controls": [
-      {
-        "type": "label",
-        "x": 0,
-        "y": 100,
-        "width": 3000,
-        "height": 400,
-        "text": "Customer",
-        "bold": true
-      },
-      {
-        "type": "label",
-        "x": 3000,
-        "y": 100,
-        "width": 3000,
-        "height": 400,
-        "text": "Invoice No.",
-        "bold": true
-      },
-      {
-        "type": "label",
-        "x": 6000,
-        "y": 100,
-        "width": 3000,
-        "height": 400,
-        "text": "Amount",
-        "bold": true,
-        "align": "right"
-      }
-    ]
-  },
-  "detail": {
-    "height": 600,
-    "controls": [
-      {
-        "type": "field",
-        "x": 0,
-        "y": 100,
-        "width": 3000,
-        "height": 400,
-        "field": "customer_name"
-      },
-      {
-        "type": "field",
-        "x": 3000,
-        "y": 100,
-        "width": 3000,
-        "height": 400,
-        "field": "invoice_no"
-      },
-      {
-        "type": "field",
-        "x": 6000,
-        "y": 100,
-        "width": 3000,
-        "height": 400,
-        "field": "amount",
-        "align": "right",
-        "format": "#,##0"
-      },
-      {
-        "type": "line",
-        "x": 0,
-        "y": 580,
-        "width": 9000,
-        "height": 0,
-        "thickness": 15
-      }
-    ]
-  },
-  "page_footer": {
-    "height": 500,
-    "controls": [
-      {
-        "type": "label",
-        "x": 0,
-        "y": 50,
-        "width": 9000,
-        "height": 300,
-        "text": "ACR Engine",
-        "align": "center",
-        "font_size": 9
-      }
-    ]
-  }
-}
+```
+1. Load template.json
+2. Bind datasource to sections
+3. Evaluate group keys → determine section repetition
+4. Calculate element positions (Layout Engine)
+5. Produce Drawing Model (JSON)
+6. Render via Google Skia (Drawing Engine)
+7. Output to target format
 ```
 
----
-
-## 27. Compatibility Policy
-
-ACR is conceptually compatible with section-based report systems such as ActiveReports in the following sense:
-
-* band-oriented layout,
-* repeated detail rows,
-* page header/footer model,
-* group header/footer model.
-
-However, ACR is defined as a JSON-based specification and is not intended to duplicate every legacy feature.
+No printer driver is required at any stage.
 
 ---
 
-## 28. Non-Goals
+## Implementation Languages
 
-The following are explicitly outside the current scope:
+ACR can be implemented in any language with Skia bindings or a compatible 2D graphics library.
 
-* free-flow text layout,
-* browser DOM rendering rules,
-* nested sub-report execution,
-* runtime section restructuring,
-* automatic designer-specific behaviors not represented in JSON.
-
----
-
-## 29. Versioning Policy
-
-* Major version changes may introduce structural changes.
-* Minor version changes may add optional fields or clarify rules.
-* Engines should validate template versions before rendering.
+| Language | Status |
+|----------|--------|
+| Rust | Reference implementation ([acr-engine](https://github.com/acrossreport/acr-engine)) |
+| C++ | Planned |
+| C# | Planned |
+| WebAssembly | Planned |
 
 ---
 
-## 30. Changelog
+## Compatibility
 
-| Version | Summary                                                                                                                          |
-| ------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| 2.0     | Reorganized full specification with section model, pagination rules, group rules, control definitions, and normative constraints |
-| 1.x     | Early draft-level overview and structure definitions                                                                             |
+| Feature | ActiveReports | ACR |
+|---------|---------------|-----|
+| Section model | ✓ | ✓ (compatible) |
+| JSON template | — | ✓ |
+| Printer-independent | — | ✓ |
+| WYSIWYG guarantee | partial | ✓ |
+| Hardware-free preview | — | ✓ |
+
+---
+
+## Changelog
+
+| Version | Date | Description |
+|---------|------|-------------|
+| 1.0 | 2026-02-26 | Initial release |
+
+---
+
+*ACR Specification — acrossreport/acr-spec*
