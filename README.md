@@ -104,4 +104,3 @@ See [acrossreport.com](https://acrossreport.com) for products built on this spec
 ## License
 
 See [LICENSE](LICENSE) for details.
-
