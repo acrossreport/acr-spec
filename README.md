@@ -47,8 +47,8 @@ Templates are defined in human-readable JSON. The layout engine produces a drawi
 **Skia-based rendering**  
 The drawing engine uses Google Skia, the same graphics library behind Chrome and Android. This guarantees consistent, high-fidelity output across all platforms.
 
-**ActiveReports-compatible section model**  
-ACR adopts a familiar section-based structure (Report Header / Page Header / Group Header / Detail / Group Footer / Page Footer / Report Footer) compatible with ActiveReports conventions, minimizing migration effort for existing report definitions.
+**Section-based report model**  
+ACR adopts a familiar section-based structure (Report Header / Page Header / Group Header / Detail / Group Footer / Page Footer / Report Footer), widely used in business reporting, minimizing migration effort for existing report definitions.
 
 **Hardware-free preview**  
 A complete, pixel-accurate preview is available without physical printers, drivers, or specialized hardware. What you see is exactly what will be printed.
@@ -97,10 +97,11 @@ Design decisions are documented as ADRs in [`docs/adr/`](docs/adr/).
 ## Status
 
 ACR is under active development. The specification and schema are stabilizing.  
-See [acr-engine](https://github.com/acrossreport/acr-engine) for the reference implementation in Rust.
+See [acrossreport.com](https://acrossreport.com) for products built on this specification.
 
 ---
 
 ## License
 
 See [LICENSE](LICENSE) for details.
+
