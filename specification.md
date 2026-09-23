@@ -58,8 +58,8 @@ They can be inspected, cached, versioned, and transmitted independently of rende
 The drawing engine uses Google Skia — the same graphics library behind Chrome and Android.  
 This guarantees consistent, high-fidelity output across all platforms.
 
-**ActiveReports-compatible section model**  
-ACR adopts a section-based layout structure compatible with ActiveReports conventions.
+**Section-based report model**  
+ACR adopts a familiar section-based layout structure widely used in business reporting.
 
 ---
 
@@ -136,7 +136,7 @@ Defines the logical page size and margins.
 
 ## Section Model
 
-ACR uses a section-based layout model compatible with ActiveReports.  
+ACR uses a section-based layout model widely used in business reporting.  
 Sections are processed in order and rendered to the page sequentially.
 
 ### Section Types
@@ -399,9 +399,9 @@ ACR can be implemented in any language with Skia bindings or a compatible 2D gra
 
 ## Compatibility
 
-| Feature | ActiveReports | ACR |
-|---------|---------------|-----|
-| Section model | ✓ | ✓ (compatible) |
+| Feature | Traditional reporting tools | ACR |
+|---------|-----------------------------|-----|
+| Section model | ✓ | ✓ |
 | JSON template | — | ✓ |
 | Printer-independent | — | ✓ |
 | WYSIWYG guarantee | partial | ✓ |
