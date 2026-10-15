@@ -100,27 +100,33 @@ JSON は単なるデータ形式ではなく、ACR における **「描画意�
 
 ### JSON テンプレートの基本構造（概念）
 
-以下の例は [specification.ja.md](specification.ja.md) の形式に従っている（A4、300 DPI、単位はドット）。
+以下の例は [specification.ja.md](specification.ja.md) の形式に従っている（単位はtwip）。
 
 ```json
 {
-  "version": "1.0",
-  "page": { "width": 2480, "height": 3508, "unit": "dot", "dpi": 300 },
-  "sections": [
-    {
-      "type": "ReportHeader",
-      "height": 236,
-      "elements": [
-        {
-          "type": "TextBox",
-          "x": 118, "y": 59, "width": 2244, "height": 118,
-          "text": "{{ reportTitle }}",
-          "font": { "family": "IPAex明朝", "size": 14, "bold": true },
-          "alignment": "center"
-        }
-      ]
+  "ACR": {
+    "Report": {
+      "PageSettings": { "PaperWidth": 11906, "PaperHeight": 16838, "Orientation": 1 },
+      "Sections": {
+        "Section": [
+          {
+            "Name": "pageheader",
+            "Type": "ACR.PageHeader",
+            "Height": 236,
+            "Control": [
+              {
+                "Type": "ACR.Label",
+                "Name": "txtreporttitle",
+                "Left": 118, "Top": 59, "Width": 2244, "Height": 118,
+                "Text": "帳票タイトル",
+                "Style": "font-family: IPAex明朝; font-size: 14pt; font-weight: bold; text-align: center"
+              }
+            ]
+          }
+        ]
+      }
     }
-  ]
+  }
 }
 ```
 
@@ -235,6 +241,7 @@ ACR の帳票レイアウト体系として、業務帳票で広く普及して�
 |------------|------|----------|------|
 | 0.1 | 2026-05-24 | 初版作成 | MaskedRiderSystem |
 | 0.2 | 2026-09-23 | ADR-003 をセクション型の構造として改訂、ADR-002 の例を specification.md に合わせて修正、ADR-005 の表記を修正（特許出願中） | MaskedRiderSystem |
+| 0.3 | 2026-10-15 | ADR-002 の例を specification.md v2.0（実際の `ACR.Report`/twip ベースの形式。旧・未実装の草案ではない）に合わせて更新 | MaskedRiderSystem and claude |
 
 ---
 

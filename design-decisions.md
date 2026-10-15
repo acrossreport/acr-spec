@@ -100,27 +100,33 @@ JSON is not treated merely as a data format. Within ACR it is positioned as an *
 
 ### Conceptual Template Structure
 
-The example below follows the format defined in [specification.md](specification.md) (A4 at 300 DPI, in dots).
+The example below follows the format defined in [specification.md](specification.md) (coordinates in twips).
 
 ```json
 {
-  "version": "1.0",
-  "page": { "width": 2480, "height": 3508, "unit": "dot", "dpi": 300 },
-  "sections": [
-    {
-      "type": "ReportHeader",
-      "height": 236,
-      "elements": [
-        {
-          "type": "TextBox",
-          "x": 118, "y": 59, "width": 2244, "height": 118,
-          "text": "{{ reportTitle }}",
-          "font": { "family": "Arial", "size": 14, "bold": true },
-          "alignment": "center"
-        }
-      ]
+  "ACR": {
+    "Report": {
+      "PageSettings": { "PaperWidth": 11906, "PaperHeight": 16838, "Orientation": 1 },
+      "Sections": {
+        "Section": [
+          {
+            "Name": "pageheader",
+            "Type": "ACR.PageHeader",
+            "Height": 236,
+            "Control": [
+              {
+                "Type": "ACR.Label",
+                "Name": "txtreporttitle",
+                "Left": 118, "Top": 59, "Width": 2244, "Height": 118,
+                "Text": "Report Title",
+                "Style": "font-family: Arial; font-size: 14pt; font-weight: bold; text-align: center"
+              }
+            ]
+          }
+        ]
+      }
     }
-  ]
+  }
 }
 ```
 
@@ -235,6 +241,7 @@ ACR guarantees that developers and operations staff can verify accurate previews
 |---------|------|-------------|--------|
 | 0.1 | 2026-05-24 | Initial draft | MaskedRiderSystem |
 | 0.2 | 2026-09-23 | Revised ADR-003 as a section-based structure; aligned the ADR-002 example with specification.md; updated ADR-005 wording (patent pending) | MaskedRiderSystem |
+| 0.3 | 2026-10-15 | Updated the ADR-002 example to match specification.md v2.0 (actual `ACR.Report` / twip-based schema, not the earlier unimplemented draft) | MaskedRiderSystem and claude |
 
 ---
 

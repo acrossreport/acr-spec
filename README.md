@@ -59,38 +59,39 @@ A complete, pixel-accurate preview is available without physical printers, drive
 
 ```
 acr-spec/
-├── README.md                  ← This file
-├── specification.md           ← Full ACR specification
-├── template.schema.json       ← JSON Schema for template validation
-├── docs/
-│   └── adr/                   ← Architecture Decision Records
-│       ├── README.md
-│       ├── ADR-001-ACR-ja.md  ← アーキテクチャ決定記録（日本語）
-│       └── ADR-001-ACR-en.md  ← Architecture Decision Records (English)
-└── examples/
-    └── invoice/               ← Sample invoice template
+├── README.md                  ← This file (English)
+├── README.ja.md               ← 日本語版
+├── README.fr.md               ← Version française
+├── specification.md           ← Full ACR specification (English)
+├── specification.ja.md        ← 仕様（日本語）
+├── specification.fr.md        ← Spécification (français)
+├── design-decisions.md        ← Architecture Decision Records (English)
+├── design-decisions.ja.md     ← アーキテクチャ決定記録（日本語）
+└── design-decisions.fr.md     ← Historique des décisions d'architecture (français)
 ```
 
 ---
 
 ## Architecture Decision Records (ADR)
 
-Design decisions are documented as ADRs in [`docs/adr/`](docs/adr/).
+Design decisions are documented as ADRs in [design-decisions.md](design-decisions.md).
 
 | ADR | Title | Status |
 |-----|-------|--------|
-| [ADR-001](docs/adr/ADR-001-ACR-en.md) | Adopt Google Skia / JSON Model / Section Structure / WYSIWYG / Hardware-free Preview | Accepted |
+| ADR-001 | Adopt Google Skia | Accepted |
+| ADR-002 | Adopt JSON as the Intermediate Drawing Model for Templates | Accepted |
+| ADR-003 | Adopt a Section-Based Report Structure | Accepted |
+| ADR-004 | WYSIWYG Precision as the Top Design Principle | Accepted |
+| ADR-005 | Adopt a Hardware-Free Preview Philosophy | Accepted |
 
-日本語版: [`docs/adr/ADR-001-ACR-ja.md`](docs/adr/ADR-001-ACR-ja.md)
+日本語版: [design-decisions.ja.md](design-decisions.ja.md) / Français : [design-decisions.fr.md](design-decisions.fr.md)
 
 ---
 
 ## Documentation
 
 - [Specification](specification.md) — Full ACR template and rendering specification
-- [JSON Schema](template.schema.json) — Machine-readable schema for template validation
-- [ADR (English)](docs/adr/ADR-001-ACR-en.md) — Architecture decisions in English
-- [ADR（日本語）](docs/adr/ADR-001-ACR-ja.md) — アーキテクチャ決定記録
+- [Architecture Decision Records](design-decisions.md) — Design rationale behind ACR
 
 ---
 

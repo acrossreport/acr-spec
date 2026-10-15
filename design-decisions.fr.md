@@ -100,27 +100,33 @@ JSON n'est pas traité comme un simple format de données. Dans ACR, il est posi
 
 ### Structure conceptuelle d'un modèle
 
-L'exemple ci-dessous suit le format défini dans [specification.fr.md](specification.fr.md) (A4 à 300 DPI, en points).
+L'exemple ci-dessous suit le format défini dans [specification.fr.md](specification.fr.md) (coordonnées en twips).
 
 ```json
 {
-  "version": "1.0",
-  "page": { "width": 2480, "height": 3508, "unit": "dot", "dpi": 300 },
-  "sections": [
-    {
-      "type": "ReportHeader",
-      "height": 236,
-      "elements": [
-        {
-          "type": "TextBox",
-          "x": 118, "y": 59, "width": 2244, "height": 118,
-          "text": "{{ reportTitle }}",
-          "font": { "family": "Arial", "size": 14, "bold": true },
-          "alignment": "center"
-        }
-      ]
+  "ACR": {
+    "Report": {
+      "PageSettings": { "PaperWidth": 11906, "PaperHeight": 16838, "Orientation": 1 },
+      "Sections": {
+        "Section": [
+          {
+            "Name": "pageheader",
+            "Type": "ACR.PageHeader",
+            "Height": 236,
+            "Control": [
+              {
+                "Type": "ACR.Label",
+                "Name": "txtreporttitle",
+                "Left": 118, "Top": 59, "Width": 2244, "Height": 118,
+                "Text": "Titre du rapport",
+                "Style": "font-family: Arial; font-size: 14pt; font-weight: bold; text-align: center"
+              }
+            ]
+          }
+        ]
+      }
     }
-  ]
+  }
 }
 ```
 
@@ -235,6 +241,7 @@ ACR garantit que les développeurs et le personnel d'exploitation peuvent vérif
 |---------|------|-------------|--------|
 | 0.1 | 2026-05-24 | Version initiale | MaskedRiderSystem |
 | 0.2 | 2026-09-23 | ADR-003 révisé en structure par sections ; exemple de l'ADR-002 aligné sur specification.md ; formulation de l'ADR-005 mise à jour (brevet en cours) | MaskedRiderSystem |
+| 0.3 | 2026-10-15 | Exemple de l'ADR-002 mis à jour pour correspondre à specification.md v2.0 (schéma réel `ACR.Report`/twip, et non l'ancien brouillon non implémenté) | MaskedRiderSystem and claude |
 
 ---
 

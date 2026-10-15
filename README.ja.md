@@ -61,37 +61,37 @@ ACRは、業務帳票で広く使われているセクション型の構造（�
 acr-spec/
 ├── README.md                  ← 英語版
 ├── README.ja.md               ← このファイル
-├── specification.md           ← ACR仕様の全文
-├── template.schema.json       ← テンプレート検証用のJSON Schema
-├── docs/
-│   └── adr/                   ← アーキテクチャ決定記録
-│       ├── README.md
-│       ├── ADR-001-ACR-ja.md  ← アーキテクチャ決定記録（日本語）
-│       └── ADR-001-ACR-en.md  ← Architecture Decision Records (English)
-└── examples/
-    └── invoice/               ← 請求書テンプレートのサンプル
+├── README.fr.md               ← フランス語版
+├── specification.md           ← ACR仕様の全文（英語）
+├── specification.ja.md        ← 仕様（日本語）
+├── specification.fr.md        ← 仕様（フランス語）
+├── design-decisions.md        ← アーキテクチャ決定記録（英語）
+├── design-decisions.ja.md     ← アーキテクチャ決定記録（日本語）
+└── design-decisions.fr.md     ← アーキテクチャ決定記録（フランス語）
 ```
 
 ---
 
 ## アーキテクチャ決定記録（ADR）
 
-設計上の決定は、[`docs/adr/`](docs/adr/) にADRとして記録しています。
+設計上の決定は、[design-decisions.ja.md](design-decisions.ja.md) にADRとして記録しています。
 
 | ADR | タイトル | 状態 |
 |-----|----------|------|
-| [ADR-001](docs/adr/ADR-001-ACR-ja.md) | Google Skia／JSONモデル／セクション構造／WYSIWYG／実機不要のプレビューの採用 | 承認済み |
+| ADR-001 | Google Skiaの採用 | 承認済み |
+| ADR-002 | テンプレート形式にJSON中間描画モデルを採用 | 承認済み |
+| ADR-003 | セクション型の帳票構造を採用 | 承認済み |
+| ADR-004 | WYSIWYG精度を最優先設計原則とする | 承認済み |
+| ADR-005 | 実機不要プレビュー哲学を採用 | 承認済み |
 
-English: [`docs/adr/ADR-001-ACR-en.md`](docs/adr/ADR-001-ACR-en.md)
+English: [design-decisions.md](design-decisions.md) / Français : [design-decisions.fr.md](design-decisions.fr.md)
 
 ---
 
 ## ドキュメント
 
-- [仕様](specification.md) — ACRのテンプレートと描画の仕様の全文
-- [JSON Schema](template.schema.json) — テンプレート検証用の機械可読なスキーマ
-- [ADR（日本語）](docs/adr/ADR-001-ACR-ja.md) — アーキテクチャ決定記録
-- [ADR (English)](docs/adr/ADR-001-ACR-en.md) — Architecture decisions in English
+- [仕様](specification.ja.md) — ACRのテンプレートと描画の仕様の全文
+- [アーキテクチャ決定記録](design-decisions.ja.md) — ACRの設計根拠
 
 ---
 
